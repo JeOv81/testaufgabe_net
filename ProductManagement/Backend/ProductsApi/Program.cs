@@ -9,6 +9,11 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using ProductsApi.Endpoints.Products;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;             
+using System.Text;                               
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +56,21 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthorizationBuilder()
   .AddPolicy("admin-policy", policy =>
         policy.RequireRole("admin"));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"], // Aus appsettings.json
+            ValidAudience = builder.Configuration["Jwt:Audience"], // Aus appsettings.json
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Aus appsettings.json
+        };
+    });
 
 builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
