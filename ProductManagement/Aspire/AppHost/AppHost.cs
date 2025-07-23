@@ -8,4 +8,9 @@ var productsApi = builder.AddProject<Projects.ProductsApi>("products-api")
     .WithReference(productsDb)
     .WaitFor(productsDb);
 
+builder.AddProject<Projects.MigrationService>("migrationservice")
+    .WithReference(productsDb)
+    .WaitFor(productsDb)
+    .WithParentRelationship(sqlserver);
+
 builder.Build().Run();
