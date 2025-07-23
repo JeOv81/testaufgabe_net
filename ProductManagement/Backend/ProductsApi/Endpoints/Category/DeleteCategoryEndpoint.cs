@@ -8,6 +8,7 @@ public class DeleteCategoryEndpoint : IEndpoint
     public void Map(IEndpointRouteBuilder app)
     {
         app.MapDelete("/categories/{id}", HandleAsync)
+           .RequireAuthorization("admin-policy")
            .WithName("DeleteCategory")
            .WithTags("Categories")
            .Produces(StatusCodes.Status204NoContent)

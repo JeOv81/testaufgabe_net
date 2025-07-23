@@ -9,6 +9,7 @@ public class GetAllProductsEndpoint : IEndpoint
     public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/products", HandleAsync)
+           .AllowAnonymous()
            .WithName("GetAllProducts")
            .WithTags("Products")
            .Produces<ICollection<ProductDto>>(StatusCodes.Status200OK);
