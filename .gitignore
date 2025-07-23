@@ -1,0 +1,95 @@
+##############################################
+# .NET / ASP.NET Core
+##############################################
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.ide
+.vscode/
+.vs/
+
+# Rider / JetBrains
+.idea/
+*.DotSettings.user
+*.sln.iml
+
+# dotnet tooling
+project.lock.json
+project.fragment.lock.json
+artifacts/
+.vscode/
+.vs/
+*.dbmdl
+*.bak
+*.log
+
+# ASP.NET / Kestrel generated certs
+*.pfx
+*.pem
+
+# Secrets
+secrets.json
+appsettings.Development.json
+
+##############################################
+# Docker
+##############################################
+**/docker-compose.override.yml
+**/*.pid
+**/.dockerignore
+**/Dockerfile.*
+**/docker-compose*.override.yml
+**/docker-compose.generated.yml
+
+##############################################
+# Aspire (optional, falls Build-Artefakte)
+##############################################
+**/obj/Debug/net*/generated/
+**/obj/Debug/net*/staticwebassets/
+
+##############################################
+# Node / Angular / Blazor WebAssembly
+##############################################
+# Node
+node_modules/
+dist/
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+*.tsbuildinfo
+
+# Angular CLI
+.angular/
+.angular-cache/
+.angular.json
+
+# Blazor (WASM)
+wwwroot/css/
+wwwroot/js/
+**/bin/
+**/obj/
+*.Publish.xml
+
+# Output / Coverage / Logs
+coverage/
+TestResults/
+*.log
+*.coverage
+*.ncrunch*
+.nunit/
+*.trx
+
+##############################################
+# Backup / temp
+##############################################
+*.bak
+*.tmp
+*.swp
+*.swo
+*.orig
+
