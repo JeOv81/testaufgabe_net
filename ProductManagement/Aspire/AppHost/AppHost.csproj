@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Backend\MigrationService\MigrationService.csproj" />
     <ProjectReference Include="..\..\Backend\ProductsApi\ProductsApi.csproj" />
   </ItemGroup>
 

@@ -13,6 +13,5 @@ public class Product : IGuidEntity
     public decimal Price { get; set; } 
     public string? Description { get; set; }
 
-    public int CategoryId { get; set; }
-    public virtual ICollection<Category> Category { get; set; }
+    public virtual ICollection<Category> Categories { get; set; } = [];
 }
