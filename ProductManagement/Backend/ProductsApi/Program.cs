@@ -1,4 +1,7 @@
+using Application.Features.Products.Commands;
 using Application.Interfaces;
+using Application.Validations.Products;
+using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using OpenTelemetry;
@@ -15,7 +18,7 @@ string serviceName = builder.Configuration["SERVICE_NAME"] ?? "NoServiceName";
 
 // Scrutor Handler registrieren
 builder.Services.Scan(scan => scan
-    .FromAssemblies(typeof(Application.Features.Products.Commands.CreateProductCommandHandler).Assembly)
+    .FromAssemblies(typeof(CreateProductCommandHandler).Assembly)
     .AddClasses(classes => classes
         .InNamespaces("Application.Features")
         .Where(type =>
@@ -26,10 +29,13 @@ builder.Services.Scan(scan => scan
 
 // Scrutor Endpoints
 builder.Services.Scan(scan => scan
-    .FromAssemblies(typeof(ProductsApi.Endpoints.Products.GetAllProductsEndpoint).Assembly)
+    .FromAssemblies(typeof(GetAllProductsEndpoint).Assembly)
     .AddClasses(classes => classes.AssignableTo<IEndpoint>())
     .AsImplementedInterfaces()
     .WithScopedLifetime());
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssembly(typeof(CreateProductCommandValidator).Assembly);
 
 // Postgresql
 builder.AddNpgsqlDbContext<ProductsContext>(connectionName: "products-db");

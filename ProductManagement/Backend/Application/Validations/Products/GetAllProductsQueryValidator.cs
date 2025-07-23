@@ -1,0 +1,16 @@
+﻿using Application.Features.Products.Queries;
+using FluentValidation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Validations.Products;
+public class GetAllProductsQueryValidator : AbstractValidator<GetAllProductsQuery>
+{
+    public GetAllProductsQueryValidator()
+    {
+    
+    }
+}
