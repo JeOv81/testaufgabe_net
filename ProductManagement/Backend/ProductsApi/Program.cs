@@ -1,11 +1,17 @@
 using Application.Interfaces;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
-using System.Reflection;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Configuration.AddEnvironmentVariables();
+string serviceName = builder.Configuration["SERVICE_NAME"] ?? "NoServiceName";
 
 // Scrutor Handler registrieren
 builder.Services.Scan(scan => scan
@@ -20,7 +26,7 @@ builder.Services.Scan(scan => scan
 
 // Scrutor Endpoints
 builder.Services.Scan(scan => scan
-    .FromAssemblies(typeof(ProductsApi.Endpoints.Products.GetAllProductsEndpoint).Assembly) 
+    .FromAssemblies(typeof(ProductsApi.Endpoints.Products.GetAllProductsEndpoint).Assembly)
     .AddClasses(classes => classes.AssignableTo<IEndpoint>())
     .AsImplementedInterfaces()
     .WithScopedLifetime());
@@ -39,6 +45,42 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthorizationBuilder()
   .AddPolicy("admin-policy", policy =>
         policy.RequireRole("admin"));
+
+builder.Services.AddOpenTelemetry()
+            .WithMetrics(metrics =>
+            {
+                metrics.SetResourceBuilder(CreateResourceBuilder(builder.Configuration));
+                metrics.AddAspNetCoreInstrumentation()
+                       .AddHttpClientInstrumentation()
+                       .AddMeter("Microsoft.AspNetCore.Hosting")
+                       .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+                       .AddMeter("System.Net.Http")
+                       .AddMeter(serviceName);
+                metrics.AddOtlpExporter(otlp =>
+                {
+                    otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+                    otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
+                });
+            })
+            .WithLogging(logging =>
+            {
+                logging.SetResourceBuilder(CreateResourceBuilder(builder.Configuration));
+                logging.AddOtlpExporter(otlp =>
+                {
+                    otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+                    otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
+                });
+            })
+            .WithTracing(tracing =>
+            {
+                tracing.AddAspNetCoreInstrumentation();
+                tracing.AddConsoleExporter();
+                tracing.AddOtlpExporter(otlp =>
+                {
+                    otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+                    otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
+                });
+            });
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -66,3 +108,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+static ResourceBuilder CreateResourceBuilder(IConfiguration configuration)
+{
+    return ResourceBuilder.CreateDefault()
+        .AddService(configuration["SERVICE_NAME"] ?? "NoServiceName");
+}
