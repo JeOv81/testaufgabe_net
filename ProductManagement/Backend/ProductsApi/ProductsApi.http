@@ -1,6 +1,74 @@
 @ProductsApi_HostAddress = http://localhost:5044
+# Alternativer Host, falls Ihre Anwendung HTTPS auf Port 7294 verwendet:
+# @ProductsApi_HostAddress = https://localhost:7294
 
-GET {{ProductsApi_HostAddress}}/weatherforecast/
-Accept: application/json
+@categoryId_electronics = 00000000-0000-0000-0000-000000000000
+@categoryId_books = 00000000-0000-0000-0000-000000000000
+@categoryId_fashion = 00000000-0000-0000-0000-000000000000
+
+@productId_laptop = 00000000-0000-0000-0000-000000000000
+@productId_mouse = 00000000-0000-0000-0000-000000000000
+@productId_hitchhikersGuide = 00000000-0000-0000-0000-000000000000
+@productId_tShirt = 00000000-0000-0000-0000-000000000000
 
 ###
+GET {{ProductsApi_HostAddress}}/categories
+
+###
+GET {{ProductsApi_HostAddress}}/products
+
+###
+GET {{ProductsApi_HostAddress}}/categories/{{categoryId_electronics}}
+
+###
+PUT {{ProductsApi_HostAddress}}/categories/{{categoryId_fashion}}
+Content-Type: application/json
+
+{
+  "id": "{{categoryId_fashion}}",
+  "name": "Apparel"
+}
+
+###
+DELETE {{ProductsApi_HostAddress}}/categories/{{categoryId_books}}
+
+###
+GET {{ProductsApi_HostAddress}}/products/{{productId_laptop}}
+
+###
+PUT {{ProductsApi_HostAddress}}/products/{{productId_mouse}}
+Content-Type: application/json
+
+{
+  "id": "{{productId_mouse}}",
+  "name": "GamingMousePro",
+  "price": 49.99,
+  "description": "High-precision gaming mouse with RGB.",
+  "categoryIds": [
+    "{{categoryId_electronics}}"
+  ]
+}
+
+###
+DELETE {{ProductsApi_HostAddress}}/products/{{productId_tShirt}}
+
+###
+POST {{ProductsApi_HostAddress}}/products
+Content-Type: application/json
+
+{
+  "name": "WirelessHeadphones",
+  "price": 99.99,
+  "description": "Noise-cancelling headphones for immersive audio.",
+  "categoryIds": [
+    "{{categoryId_electronics}}"
+  ]
+}
+
+###
+POST {{ProductsApi_HostAddress}}/categories
+Content-Type: application/json
+
+{
+  "name": "NewCategoryForTesting"
+}
