@@ -4,6 +4,8 @@ var sqlserver = builder.AddPostgres("postgresql")
                                                        .WithLifetime(ContainerLifetime.Persistent);
 var productsDb = sqlserver.AddDatabase("products-db");
 
-builder.AddProject<Projects.ProductsApi>("products-api");
+var productsApi = builder.AddProject<Projects.ProductsApi>("products-api")
+    .WithReference(productsDb)
+    .WaitFor(productsDb);
 
 builder.Build().Run();

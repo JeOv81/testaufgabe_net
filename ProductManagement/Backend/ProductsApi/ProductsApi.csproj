@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
   </ItemGroup>
   <ItemGroup>
@@ -15,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Aspire\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 </Project>
