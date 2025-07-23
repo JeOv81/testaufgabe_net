@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\Backend\ProductsApi\ProductsApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Observability\grafana\dashboards\plugins\" />
+  </ItemGroup>
+
 </Project>
