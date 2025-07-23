@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,18 @@ builder.Services.Scan(scan => scan
 
 // Postgresql
 builder.AddNpgsqlDbContext<ProductsContext>(connectionName: "products-db");
+
+// Secure endpoints without attributes
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
+builder.Services.AddAuthorizationBuilder()
+  .AddPolicy("admin-policy", policy =>
+        policy.RequireRole("admin"));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

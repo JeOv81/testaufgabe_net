@@ -8,9 +8,10 @@ public class DeleteProductEndpoint : IEndpoint
     public void Map(IEndpointRouteBuilder app)
     {
         app.MapDelete("/products/{id}", HandleAsync)
+           .RequireAuthorization("admin-policy")
            .WithName("DeleteProduct")
            .WithTags("Products")
-           .Produces(StatusCodes.Status204NoContent) 
+           .Produces(StatusCodes.Status204NoContent)
            .Produces(StatusCodes.Status404NotFound);
     }
 
@@ -24,6 +25,6 @@ public class DeleteProductEndpoint : IEndpoint
         {
             return Results.NotFound($"Product with ID '{id}' not found.");
         }
-        return Results.NoContent(); 
+        return Results.NoContent();
     }
 }

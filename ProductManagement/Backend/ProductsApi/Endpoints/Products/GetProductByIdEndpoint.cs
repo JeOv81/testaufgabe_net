@@ -9,6 +9,7 @@ public class GetProductByIdEndpoint : IEndpoint
     public void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/products/{id}", HandleAsync)
+           .AllowAnonymous()
            .WithName("GetProductById")
            .WithTags("Products")
            .Produces<ProductDto>(StatusCodes.Status200OK)
