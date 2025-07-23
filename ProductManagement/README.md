@@ -42,17 +42,21 @@ Die Struktur deines Backends folgt den gewählten Architekturstilen.
 Eine klassische Clean Architecture mit klarer Trennung der Verantwortlichkeiten.
 
 Domain\ - **Kernlogik, Entitäten, Schnittstellen und Value Objects.**
+
 ├── Entities\
 └── Interfaces\
 Application\ - **Anwendungslogik, Use Cases, DTOs und Service-Schnittstellen.**
+
 ├── Interfaces\
 ├── Dtos\
 └── Services\
 Infrastructure\ - **Implementierungen von Schnittstellen aus der Domain/Application, Datenbankzugriff, externe Services.**
+
 ├── Persistence\
 ├── Repositories\
 └── Services\
 ProductsApi\ - **Einstiegspunkt (API), Endpunkte (Controller), Dependency Injection.**
+
 ├── Endpoints\
 └── Program.cs
 Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests.**
@@ -64,21 +68,31 @@ Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests.**
 
 1.  **Voraussetzungen installieren**
     * .NET 9 SDK und das Aspire-Workload:
-        dotnet workload install aspire
+            dotnet workload install aspire
     * Das Aspire CLI Tool:
-        dotnet tool install --global aspire.cli --prerelease
+            dotnet tool install --global aspire.cli --prerelease
     * Docker (Desktop)
     
 2.  **Starten des Projekts**
     * Wechsle in das Solution-Hauptverzeichnis (cd ProductManagement).
     * Starte das Projekt mit dem .NET SDK (empfohlen):
-        dotnet build Aspire\AppHost
-        dotnet run --project Aspire\AppHost
+        - dotnet build Aspire\AppHost
+        - dotnet run --project Aspire\AppHost
     * Alternativ mit dem Aspire CLI (verwendet einen zufälligen Port):
-        aspire run
+        - aspire run
 
 ---
 ### Wichtige URLs
 
 -   **Aspire Dashboard**: https://localhost:17198
 -   **Products-Api**: https://localhost:7294, http://localhost:5044
+
+
+### Was wurde gemacht:
+- Validierung hinzugefügt
+- Opentelemetry/Metrics hinzugefügt
+- Datenbankanbindung mit EF-Core (MigrationService für die Migration der Datenbank) / verwendete Datenbank: Postgres
+- CQRS 
+- Policy zum absichern der Endpunkte. Diese sollten secure by default sein, damit nicht schlimmes passieren kann.
+- Verwendung von Aspire anstelle von Docker.Compose
+- Pagination bei der Query hinzugefügt
