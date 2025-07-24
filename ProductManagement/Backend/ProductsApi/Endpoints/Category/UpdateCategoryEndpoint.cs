@@ -1,5 +1,7 @@
 ﻿using Application.Features.Categories.Commands;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Category;
 
@@ -7,28 +9,23 @@ public class UpdateCategoryEndpoint : IEndpoint
 {
     public void Map(IEndpointRouteBuilder app)
     {
-        app.MapPut("/categories/{id}", HandleAsync)
+        app.MapPut("/categories", HandleAsync)
            .WithName("UpdateCategory")
            .WithTags("Categories")
+           .AddEndpointFilter<ValidationFilter<UpdateCategoryCommand>>()
            .Produces(StatusCodes.Status200OK) 
            .Produces(StatusCodes.Status400BadRequest)
            .Produces(StatusCodes.Status404NotFound);
     }
     public static async Task<IResult> HandleAsync(
-        Guid id,
-        UpdateCategoryCommand command,
+        [FromBody] UpdateCategoryCommand command,
         ICommandHandler<UpdateCategoryCommand, bool> handler, 
         CancellationToken ct)
     {
-        if (id != command.Id)
-        {
-            return Results.BadRequest("Category ID in route must match ID in request body.");
-        }
-
         var success = await handler.Handle(command, ct);
         if (!success)
         {
-            return Results.NotFound($"Category with ID '{id}' not found.");
+            return Results.NotFound($"Category with ID '{command.Id}' not found.");
         }
         return Results.Ok(); 
     }

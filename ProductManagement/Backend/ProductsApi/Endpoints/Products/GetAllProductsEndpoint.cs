@@ -1,6 +1,8 @@
 ﻿using Application.DTOs;
 using Application.Features.Products.Queries;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Products;
 
@@ -12,22 +14,15 @@ public class GetAllProductsEndpoint : IEndpoint
            .AllowAnonymous()
            .WithName("GetAllProducts")
            .WithTags("Products")
+           .AddEndpointFilter<ValidationFilter<GetAllProductsQuery>>()
            .Produces<ICollection<ProductDto>>(StatusCodes.Status200OK);
     }
 
     public static async Task<IResult> HandleAsync(
-        string? search, 
-        int? pageNumber, 
-        int? pageSize,  
+        [AsParameters] GetAllProductsQuery query,
         IQueryHandler<GetAllProductsQuery, ICollection<ProductDto>> handler,
         CancellationToken ct)
     {
-        var query = new GetAllProductsQuery(
-            SearchTerm: search,
-            PageNumber: pageNumber ?? 1, 
-            PageSize: pageSize ?? 10    
-        );
-
         var products = await handler.Handle(query, ct);
         return Results.Ok(products);
     }

@@ -1,5 +1,7 @@
 ﻿using Application.Features.Products.Commands;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Products;
 
@@ -11,12 +13,13 @@ public class CreateProductEndpoint : IEndpoint
         app.MapPost("/products", HandleAsync)
            .WithName("CreateProduct")
            .WithTags("Products")
+           .AddEndpointFilter<ValidationFilter<CreateProductCommand>>()
            .Produces<Guid>(StatusCodes.Status201Created) 
            .Produces(StatusCodes.Status400BadRequest)
            .Produces(StatusCodes.Status404NotFound);
     }
     public static async Task<IResult> HandleAsync(
-        CreateProductCommand command,
+        [FromBody] CreateProductCommand command,
         ICommandHandler<CreateProductCommand, Guid> handler, // Handler gibt Guid zurück
         CancellationToken ct)
     {

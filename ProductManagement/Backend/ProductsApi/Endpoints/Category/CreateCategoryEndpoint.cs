@@ -1,5 +1,7 @@
 ﻿using Application.Features.Categories.Commands;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Category;
 
@@ -11,12 +13,13 @@ public class CreateCategoryEndpoint : IEndpoint
         app.MapPost("/categories", HandleAsync)
            .WithName("CreateCategory")
            .WithTags("Categories")
+           .AddEndpointFilter<ValidationFilter<CreateCategoryCommand>>()
            .Produces<Guid>(StatusCodes.Status201Created)
            .Produces(StatusCodes.Status400BadRequest);
     }
 
     public static async Task<IResult> HandleAsync(
-        CreateCategoryCommand command,
+        [FromBody] CreateCategoryCommand command,
         ICommandHandler<CreateCategoryCommand, Guid> handler,
         CancellationToken ct)
     {
