@@ -18,6 +18,10 @@ builder.AddProject<Projects.MigrationService>("migrationservice")
     .WaitFor(productsDb)
     .WithParentRelationship(sqlserver);
 
+builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
+       .WithReference(productsApi)
+       .WithEndpoint(port: 60019, targetPort: 60019, scheme: "http", isProxied: false)
+       .WaitFor(productsApi);
 builder.Build().Run();
 
 
