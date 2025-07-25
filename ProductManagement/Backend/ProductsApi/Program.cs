@@ -11,68 +11,19 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using ProductsApi.Endpoints.Products;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;             
-using System.Text;                               
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
 builder.Configuration.AddEnvironmentVariables();
 string serviceName = builder.Configuration["SERVICE_NAME"] ?? "NoServiceName";
 
-// Scrutor Handler registrieren
-builder.Services.Scan(scan => scan
-    .FromAssemblies(typeof(CreateProductCommandHandler).Assembly)
-    .AddClasses(classes => classes
-        .InNamespaces("Application.Features")
-        .Where(type =>
-            type.Name.EndsWith("Handler") &&
-            !type.IsAbstract && !type.IsGenericTypeDefinition))
-    .AsImplementedInterfaces()
-    .WithScopedLifetime());
-
-// Scrutor Endpoints
-builder.Services.Scan(scan => scan
-    .FromAssemblies(typeof(GetAllProductsEndpoint).Assembly)
-    .AddClasses(classes => classes.AssignableTo<IEndpoint>())
-    .AsImplementedInterfaces()
-    .WithScopedLifetime());
-
-// FluentValidation
-builder.Services.AddValidatorsFromAssembly(typeof(CreateProductCommandValidator).Assembly);
-
-// Postgresql
-builder.AddNpgsqlDbContext<ProductsContext>(connectionName: "products-db");
-
-// Secure endpoints without attributes
-builder.Services.AddAuthorization(options =>
+if (Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider")
 {
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
-
-builder.Services.AddAuthorizationBuilder()
-  .AddPolicy("admin-policy", policy =>
-        policy.RequireRole("admin"));
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"], // Aus appsettings.json
-            ValidAudience = builder.Configuration["Jwt:Audience"], // Aus appsettings.json
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Aus appsettings.json
-        };
-    });
-
-builder.Services.AddOpenTelemetry()
+    builder.AddServiceDefaults();
+    builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
             {
                 metrics.SetResourceBuilder(CreateResourceBuilder(builder.Configuration));
@@ -107,6 +58,31 @@ builder.Services.AddOpenTelemetry()
                     otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
                 });
             });
+}
+
+// Scrutor Handler registrieren
+builder.Services.Scan(scan => scan
+    .FromAssemblies(typeof(CreateProductCommandHandler).Assembly)
+    .AddClasses(classes => classes
+        .InNamespaces("Application.Features")
+        .Where(type =>
+            type.Name.EndsWith("Handler") &&
+            !type.IsAbstract && !type.IsGenericTypeDefinition))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+
+// Scrutor Endpoints
+builder.Services.Scan(scan => scan
+    .FromAssemblies(typeof(GetAllProductsEndpoint).Assembly)
+    .AddClasses(classes => classes.AssignableTo<IEndpoint>())
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssembly(typeof(CreateProductCommandValidator).Assembly);
+
+// Postgresql
+builder.AddNpgsqlDbContext<ProductsContext>(connectionName: "products-db");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
