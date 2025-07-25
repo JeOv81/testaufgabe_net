@@ -93,3 +93,4 @@ TestResults/
 *.swo
 *.orig
 
+ProductManagement/Backend/ProductsApi/ProductsApi.json
