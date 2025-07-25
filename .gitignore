@@ -94,3 +94,4 @@ TestResults/
 *.orig
 
 ProductManagement/Backend/ProductsApi/ProductsApi.json
+ProductManagement/Backend/ProductsApi.Client/Generated
