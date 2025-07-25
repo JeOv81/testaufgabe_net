@@ -13,7 +13,7 @@
 ###
 ###
 # @name GetAllProducts
-GET {{baseUrl}}/products?PageNumber=1&PageSize=5
+GET {{baseUrl}}/products?PageNumber=1&PageSize=5&OrderBy=Price&Ascending=true
 Accept: application/json
 
 ###
