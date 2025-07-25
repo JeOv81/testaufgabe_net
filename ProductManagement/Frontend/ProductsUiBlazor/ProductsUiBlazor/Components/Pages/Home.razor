@@ -1,0 +1,11 @@
+﻿@page "/"
+
+<PageTitle>Overview - Home</PageTitle> 
+
+<h1>Products</h1>
+<TableviewComponent Items="ProductList" 
+                    IgnoreMember="@(new List<string> { "Categories", "AdditionalData" })" />
+
+<h1>Categories</h1>
+<TableviewComponent Items="CategoryList"
+                    IgnoreMember="@(new List<string> { "Categories", "AdditionalData" })" />

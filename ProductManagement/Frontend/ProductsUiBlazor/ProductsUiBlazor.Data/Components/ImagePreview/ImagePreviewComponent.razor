@@ -1,0 +1,44 @@
+﻿@using ProductsUiBlazor.Data.Utilities
+<div class="imagePreview">
+    @if (Toolbar != null)
+    {
+        <div class="imagePreview-toolbar imagePreview-toolbar-font">
+            <div class="imagePreview-elements">
+                @Toolbar
+            </div>
+        </div>
+    }
+
+    @if (Loading != null && Loading.Value == true)
+    {
+        <div class="spinner-position">
+            <div class="center-position">
+                <div class="inner-position">
+                    <div class="spinner"></div>
+                    <div class="spinner-message">@Localizer["LoadingMessage"]</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (FileTypeDetector.IsPdf(Filename))
+    {
+        <div class="viewer">
+            <iframe class="viewer" src="@ImageUrl"></iframe>
+        </div>
+    }
+    else if (FileTypeDetector.IsImage(Filename))
+    {
+        <div class="viewer">
+            <div class="imageViewer">
+                <img src="@ImageUrl" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="viewer">
+            <iframe class="viewer" src="@ImageUrl"></iframe>
+        </div>
+    }
+</div>

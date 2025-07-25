@@ -24,7 +24,12 @@ builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
        .WaitFor(productsApi)
        .WithParentRelationship(productsApi);
 
+builder.AddProject<Projects.ProductsUiBlazor>("products-ui-blazor")
+    .WithReference(productsApi)
+    .WaitFor(productsApi)
+    .WithParentRelationship(productsApi);
 
+builder.Build().Run();
 
 static IResourceBuilder<ContainerResource> CreateObservabilityContainer(IDistributedApplicationBuilder builder)
 {
