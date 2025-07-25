@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace Microsoft.Extensions.Hosting;
@@ -20,8 +22,8 @@ public static class Extensions
 
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        //builder.ConfigureOpenTelemetry();
-
+        builder.Configuration.AddEnvironmentVariables();
+        builder.ConfigureOpenTelemetry();
         builder.AddDefaultHealthChecks();
 
         builder.Services.AddServiceDiscovery();
@@ -53,6 +55,10 @@ public static class Extensions
         });
 
         builder.Services.AddOpenTelemetry()
+            .WithLogging(logging =>
+            {
+                logging.SetResourceBuilder(CreateResourceBuilder(builder.Configuration));
+            })
             .WithMetrics(metrics =>
             {
                 metrics.AddAspNetCoreInstrumentation()
@@ -70,7 +76,7 @@ public static class Extensions
                     )
                     // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
                     .AddGrpcClientInstrumentation()
-                    .AddHttpClientInstrumentation();
+                    .AddHttpClientInstrumentation(); 
             });
 
         builder.AddOpenTelemetryExporters();
@@ -124,4 +130,11 @@ public static class Extensions
 
         return app;
     }
+
+    static ResourceBuilder CreateResourceBuilder(IConfiguration configuration)
+    {
+        return ResourceBuilder.CreateDefault()
+            .AddService(configuration["SERVICE_NAME"] ?? "NoServiceName");
+    }
+
 }
