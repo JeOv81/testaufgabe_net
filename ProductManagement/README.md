@@ -22,15 +22,16 @@ Die Aufgabe soll dazu dienen die Programmiererfahrung anhand der Architektur, De
     -   Visual Studio
     -   REST / JSON
     -   Docker
+    -   Aspire
 -   **Frontend**
-    -   Angular (bevorzugt)
+    -   Angular 
+    -   Blazor
 -   **Backend**
     -   C# und .NET 8.0 oder neuer (Vorgabe!)
     -   ASP.NET Core (Vorgabe!)
-    -   Entity Framework Core (bevorzugt)
+    -   Entity Framework Core
 -   **Datenbank**
     -   Postgres
-    -   Redis
 
 ---
 
@@ -41,21 +42,31 @@ Die Struktur deines Backends folgt den gewählten Architekturstilen.
 ### 📁 Clean Architecture
 Eine klassische Clean Architecture mit klarer Trennung der Verantwortlichkeiten.
 
-Domain\ - **Kernlogik, Entitäten, Schnittstellen und Value Objects.**  
+Domain\ - **Kernlogik, Entitäten, Schnittstellen**  
 ├── Entities\
 └── Interfaces\
-Application\ - **Anwendungslogik, Use Cases, DTOs und Service-Schnittstellen.**  
+Application\ - **Anwendungslogik, CQRS, DTOs.**  
 ├── Interfaces\
 ├── Dtos\
-└── Services\
-Infrastructure\ - **Implementierungen von Schnittstellen aus der Domain/Application, Datenbankzugriff, externe Services.**  
+├── Features\
+└── Validations\
+Infrastructure\ - **Implementierungen von Schnittstellen aus der Domain/Application, Datenbankzugriff**  
 ├── Persistence\
-├── Repositories\
-└── Services\
-ProductsApi\ - **Einstiegspunkt (API), Endpunkte (Controller), Dependency Injection.**  
+├── Configurations\
+└── Migrations\
+ProductsApi\ - **Einstiegspunkt (API), Endpunkte, Dependency Injection,...**  
 ├── Endpoints\
+├── Filters\
+├── Interfaces\
 └── Program.cs
-Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests.**
+Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests**
+
+### Erweitert
+Solution\
+├── ApiGateway - ** YarpProxy **  
+├── Aspire - ** Aspire, AppHost **  
+├── Backend - ** s.o. **  
+└── Frontend - ** Angular, Blazor **  
 
 --
 
@@ -72,7 +83,7 @@ Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests.**
        - dotnet tool install --global Microsoft.OpenApi.Kiota
     
 2.  **Starten des Projekts**
-    * Wechsle in das Solution-Hauptverzeichnis (cd ProductManagement).
+    * Wechsle in das Solution-Hauptverzeichnis 
     * Starte das Projekt mit dem .NET SDK (empfohlen):
        - dotnet build Aspire\AppHost
        - dotnet run --project Aspire\AppHost
@@ -84,14 +95,20 @@ Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests.**
 
 -   **Aspire Dashboard**: https://localhost:17198
 -   **Products-Api**: https://localhost:7294, http://localhost:5044
+-   **Angular**: http://localhost:4200
+-   **Blazor**: https://localhost:7193, http://localhost:5010
+-   **Grafana**: http://localhost:3000/
 
-
-### Was wurde gemacht:
+### Im Projekt umgesetzt:
+- Verwendung von Aspire anstelle von Docker.Compose
 - Validierung hinzugefügt
 - Opentelemetry/Metrics hinzugefügt
-- Datenbankanbindung mit EF-Core (MigrationService für die Migration der Datenbank) / verwendete Datenbank: Postgres
+- Datenbankanbindung mit EF-Core (MigrationService für die Migration der Datenbank) 
 - CQRS 
-- Policy zum absichern der Endpunkte. Diese sollten secure by default sein, damit nicht schlimmes passieren kann.
-- Verwendung von Aspire anstelle von Docker.Compose
+- Policy hinzugefügt. (Secure by default / Secure by Design)
 - Pagination bei der Query hinzugefügt
-- Kiota-Http-Client mittels OpenApi generieren lassen
+- OpenApi - Dokument (Microsoft.Extensions.ApiDescription.Server)
+- Kiota-Http-Client für leichteren Zugriff auf die Api generieren lassen
+- Blazor-UI hinzugefügt
+- Angular-UI hinzugefügt
+- Yarp-Proxy hinzugefügt
