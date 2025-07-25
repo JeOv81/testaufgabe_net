@@ -1,7 +1,6 @@
 ﻿using Application.DTOs;
 using Application.Features.Categories.Queries;
 using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Category;
