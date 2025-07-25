@@ -7,30 +7,32 @@ var sqlserver = builder.AddPostgres("postgresql")
 var productsDb = sqlserver.AddDatabase("products-db");
 
 var productsApi = builder.AddProject<Projects.ProductsApi>("products-api")
-    .WithEnvironment("OTLP_ENDPOINT_GRPC", "http://localhost:4317")
-    .WithEnvironment("SERVICE_NAME", "products-api")
+    .WithOpentelemetry("products-api")
     .WaitFor(otelCollector)
     .WithReference(productsDb)
     .WaitFor(productsDb);
 
 builder.AddProject<Projects.MigrationService>("migrationservice")
+    .WithOpentelemetry("migrationservice")
     .WithReference(productsDb)
     .WaitFor(productsDb)
     .WithParentRelationship(sqlserver);
 
 var angular_ui = builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
-       .WithReference(productsApi)
-       .WithEndpoint(port: 4200, targetPort: 4200, scheme: "http", isProxied: false)
-       //.WithExternalHttpEndpoints()
-       .WaitFor(productsApi)
-       .WithParentRelationship(productsApi);
+    .WithOpentelemetry("angular")
+    .WithReference(productsApi)
+    .WithEndpoint(port: 4200, targetPort: 4200, scheme: "http", isProxied: false)
+    .WaitFor(productsApi)
+    .WithParentRelationship(productsApi);
 
 var blazor_ui = builder.AddProject<Projects.ProductsUiBlazor>("products-ui-blazor")
+    .WithOpentelemetry("blazor")
     .WithReference(productsApi)
     .WaitFor(productsApi)
     .WithParentRelationship(productsApi);
 
-builder.AddProject<Projects.YarpProxy>("yarpproxy")
+builder.AddProject<Projects.YarpProxy>("yarp-proxy")
+    .WithOpentelemetry("yarp")
     .WithReference(productsApi)
     .WaitFor(productsApi)
     .WaitFor(angular_ui)
