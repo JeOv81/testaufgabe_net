@@ -88,6 +88,34 @@ builder.AddNpgsqlDbContext<ProductsContext>(connectionName: "products-db");
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddAuthorization(options =>
+    {
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+    });
+
+    builder.Services.AddAuthorizationBuilder()
+                    .AddPolicy("admin-policy", policy => policy.RequireRole("admin"));
+
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"], // Aus appsettings.json
+                ValidAudience = builder.Configuration["Jwt:Audience"], // Aus appsettings.json
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Aus appsettings.json
+            };
+        });
+}
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
