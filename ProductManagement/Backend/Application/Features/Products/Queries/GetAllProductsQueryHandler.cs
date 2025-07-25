@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace Application.Features.Products.Queries;
 public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, ICollection<ProductDto>>
@@ -26,11 +27,35 @@ public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, ICo
                                      (p.Description != null && p.Description.Contains(request.SearchTerm)));
         }
 
+        if (string.IsNullOrWhiteSpace(request.OrderBy))
+        {
+            query = query.OrderBy(p => p.Name);
+        }
+        else
+        {
+            var type = typeof(Domain.Entities.Product);
+            if (type.GetProperty(request.OrderBy) is not null)
+            {
+                if(request.Ascending is true)
+                { 
+                    query = query.OrderBy(request.OrderBy)
+                                 .Reverse();
+                }
+                else
+                {
+                    query = query.OrderBy(request.OrderBy);
+                }
+            }
+            else
+            {
+                query = query.OrderBy(p => p.Name);
+            }
+        }
+
         // Pagination
         if (request.PageSize > 0 && request.PageNumber > 0)
         {
             query = query
-                .OrderBy(p => p.Name)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize);
         }
