@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Components;
 
 namespace ProductsUiBlazor.Data.Components.Tableview;

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ProductsApi.Filters;
 
