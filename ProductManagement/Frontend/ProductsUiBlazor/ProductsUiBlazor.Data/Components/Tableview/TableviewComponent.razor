@@ -1,0 +1,52 @@
+﻿@using System.Reflection
+@typeparam TItem
+<div class="tableRoot">
+    @if(Items != null && Items.Count > 0)
+    {
+        @if(memberInfos != null && memberInfos.Length > 0)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        @foreach(var memberInfo in memberInfos)
+                        {
+                            @if(memberInfo.MemberType == MemberTypes.Property)
+                            {
+                                @if(!IgnoreMember.Any(ignoredMember => string.Equals(memberInfo.Name, ignoredMember)))
+                                {
+                                    <th>
+                                        @memberInfo.Name
+                                    </th>
+                                }
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Items)
+                    {
+                        <tr>
+                            @foreach(var memberInfo in memberInfos)
+                            {
+                                @if(memberInfo.MemberType == MemberTypes.Property)
+                                {
+                                    @if(!IgnoreMember.Any(ignoredMember => string.Equals(memberInfo.Name, ignoredMember)))
+                                    {
+                                        <td>
+                                            @item.GetType().GetProperty(memberInfo.Name).GetValue(item)
+                                        </td>
+                                    }
+                                }
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+    else
+    {
+
+    }
+</div>

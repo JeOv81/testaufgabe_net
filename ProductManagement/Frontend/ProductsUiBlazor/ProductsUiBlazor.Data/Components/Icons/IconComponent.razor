@@ -1,0 +1,60 @@
+﻿@using ProductsUiBlazor.Data.Utilities
+@if (IdentifyByName)
+{
+    @if (FileTypeDetector.IsBmp(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/image_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsGif(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/image_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsJpg(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/image_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsPng(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/image_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsSvg(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/image_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsTiff(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/image_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsEmail(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/email_outline.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsText(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/file_text.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsPdf(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/file_pdf.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsWord(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/file_doc.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsExcel(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/file_xls.{FileExtension}") />
+    }
+    else if (FileTypeDetector.IsPowerpoint(Name))
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/file_ppt.{FileExtension}") />
+    }
+    else
+    {
+        <img class="icon icon-size" src=@($"{DefaultBasePath}/file.{FileExtension}") />
+    }
+}
+else
+{
+    <img class="icon icon-size" src=@($"{DefaultBasePath}/{@Name}.{FileExtension}") />
+}
