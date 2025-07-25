@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ApiGateway\YarpProxy\YarpProxy.csproj" />
     <ProjectReference Include="..\..\Backend\MigrationService\MigrationService.csproj" />
     <ProjectReference Include="..\..\Backend\ProductsApi\ProductsApi.csproj" />
     <ProjectReference Include="..\..\Frontend\ProductsUiBlazor\ProductsUiBlazor\ProductsUiBlazor.csproj" />

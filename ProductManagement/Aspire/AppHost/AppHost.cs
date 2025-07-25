@@ -18,16 +18,23 @@ builder.AddProject<Projects.MigrationService>("migrationservice")
     .WaitFor(productsDb)
     .WithParentRelationship(sqlserver);
 
-builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
+var angular_ui = builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
        .WithReference(productsApi)
-       .WithEndpoint(port: 60019, targetPort: 60019, scheme: "http", isProxied: false)
+       .WithEndpoint(port: 4200, targetPort: 4200, scheme: "http", isProxied: false)
+       //.WithExternalHttpEndpoints()
        .WaitFor(productsApi)
        .WithParentRelationship(productsApi);
 
-builder.AddProject<Projects.ProductsUiBlazor>("products-ui-blazor")
+var blazor_ui = builder.AddProject<Projects.ProductsUiBlazor>("products-ui-blazor")
     .WithReference(productsApi)
     .WaitFor(productsApi)
     .WithParentRelationship(productsApi);
+
+builder.AddProject<Projects.YarpProxy>("yarpproxy")
+    .WithReference(productsApi)
+    .WaitFor(productsApi)
+    .WaitFor(angular_ui)
+    .WaitFor(blazor_ui);
 
 builder.Build().Run();
 
