@@ -21,31 +21,39 @@ builder.AddProject<Projects.MigrationService>("migrationservice")
 builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
        .WithReference(productsApi)
        .WithEndpoint(port: 60019, targetPort: 60019, scheme: "http", isProxied: false)
-       .WaitFor(productsApi);
-builder.Build().Run();
-
+       .WaitFor(productsApi)
+       .WithParentRelationship(productsApi);
 
 
 
 static IResourceBuilder<ContainerResource> CreateObservabilityContainer(IDistributedApplicationBuilder builder)
 {
+    // Grafana
+    var grafana = builder.AddContainer("grafana", "grafana/grafana")
+        .WithBindMount(source: "./Observability/grafana/config/provisioning", target: "/etc/grafana/provisioning")
+        .WithVolume("grafana-data", "/var/lib/grafana")
+        .WithHttpEndpoint(3000, targetPort: 3000, name: "grafana");
+
     // Prometheus
     var prometheus = builder.AddContainer("prometheus", "prom/prometheus")
         .WithBindMount("Observability/prometheus/prometheus-config.yml", "/etc/prometheus/prometheus.yml", isReadOnly: true)
         .WithVolume("prometheus-data", "/prometheus")
-        .WithHttpEndpoint(9090, targetPort: 9090, name: "prometheus");
+        .WithHttpEndpoint(9090, targetPort: 9090, name: "prometheus")
+        .WithParentRelationship(grafana);
 
     // Loki
     var loki = builder.AddContainer("loki", "grafana/loki")
         .WithBindMount("Observability/loki/loki-config.yml", "/etc/loki/local-config.yaml")
         .WithEndpoint(9096, targetPort: 9096, name: "loki")
-        .WithHttpEndpoint(3100, targetPort: 3100, name: "loki-http");
+        .WithHttpEndpoint(3100, targetPort: 3100, name: "loki-http")
+        .WithParentRelationship(grafana);
 
     // Jaeger
     var jaeger = builder.AddContainer("jaeger", "jaegertracing/all-in-one")
         .WithEndpoint(targetPort: 4317, name: "grpc", scheme: "grpc")//neu
         .WithHttpEndpoint(16686, targetPort: 16686, name: "jaeger-ui")
-        .WithEndpoint(14250, targetPort: 14250, name: "jaeger");
+        .WithEndpoint(14250, targetPort: 14250, name: "jaeger")
+        .WithParentRelationship(grafana);
 
     // Tempo
     var tempo = builder.AddContainer("tempo", "grafana/tempo")
@@ -54,13 +62,9 @@ static IResourceBuilder<ContainerResource> CreateObservabilityContainer(IDistrib
         .WithArgs("-config.file=/etc/tempo.yaml")
         .WithEndpoint(targetPort: 4317, name: "grpc", scheme: "grpc")//neu
         .WithHttpEndpoint(3200, targetPort: 3200, name: "tempo-http")
-        .WithEndpoint(9095, targetPort: 9095, name: "tempo");
+        .WithEndpoint(9095, targetPort: 9095, name: "tempo")
+        .WithParentRelationship(grafana);
 
-    // Grafana
-    var grafana = builder.AddContainer("grafana", "grafana/grafana")
-        .WithBindMount(source: "./Observability/grafana/config/provisioning", target: "/etc/grafana/provisioning")
-        .WithVolume("grafana-data", "/var/lib/grafana")
-        .WithHttpEndpoint(3000, targetPort: 3000, name: "grafana");
 
     // OpenTelemetry Collector
     var otelCollector = builder.AddContainer("otel-collector", "otel/opentelemetry-collector-contrib")
@@ -73,6 +77,7 @@ static IResourceBuilder<ContainerResource> CreateObservabilityContainer(IDistrib
         .WaitFor(jaeger)
         .WaitFor(loki)
         .WaitFor(prometheus)
-        .WaitFor(tempo);
+        .WaitFor(tempo)
+        .WithParentRelationship(grafana);
     return otelCollector;
 }
