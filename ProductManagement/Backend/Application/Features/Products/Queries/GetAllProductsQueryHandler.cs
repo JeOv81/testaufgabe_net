@@ -30,6 +30,7 @@ public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, ICo
         if (request.PageSize > 0 && request.PageNumber > 0)
         {
             query = query
+                .OrderBy(p => p.Name)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize);
         }
