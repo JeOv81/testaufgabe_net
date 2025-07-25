@@ -1,5 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+string serviceName = builder.Configuration["SERVICE_NAME"] ?? "NoServiceName";
+
 builder.Services.AddServiceDiscovery();
 builder.ConfigureOpenTelemetry(); 
 

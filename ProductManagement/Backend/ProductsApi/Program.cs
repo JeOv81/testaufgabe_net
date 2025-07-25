@@ -4,7 +4,6 @@ using Application.Validations.Products;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
-using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -13,51 +12,13 @@ using ProductsApi.Endpoints.Products;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddEnvironmentVariables();
-string serviceName = builder.Configuration["SERVICE_NAME"] ?? "NoServiceName";
 
 if (Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider")
 {
     builder.AddServiceDefaults();
-    builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.SetResourceBuilder(CreateResourceBuilder(builder.Configuration));
-                metrics.AddAspNetCoreInstrumentation()
-                       .AddHttpClientInstrumentation()
-                       .AddMeter("Microsoft.AspNetCore.Hosting")
-                       .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-                       .AddMeter("System.Net.Http")
-                       .AddMeter(serviceName);
-                metrics.AddOtlpExporter(otlp =>
-                {
-                    otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
-                    otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
-                });
-            })
-            .WithLogging(logging =>
-            {
-                logging.SetResourceBuilder(CreateResourceBuilder(builder.Configuration));
-                logging.AddOtlpExporter(otlp =>
-                {
-                    otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
-                    otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
-                });
-            })
-            .WithTracing(tracing =>
-            {
-                tracing.AddAspNetCoreInstrumentation();
-                tracing.AddConsoleExporter();
-                tracing.AddOtlpExporter(otlp =>
-                {
-                    otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
-                    otlp.Endpoint = new Uri(builder.Configuration[EndPointNames.OTLP_ENDPOINT_GRPC]);
-                });
-            });
 }
 
 // Scrutor Handler registrieren
@@ -139,8 +100,3 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-static ResourceBuilder CreateResourceBuilder(IConfiguration configuration)
-{
-    return ResourceBuilder.CreateDefault()
-        .AddService(configuration["SERVICE_NAME"] ?? "NoServiceName");
-}
