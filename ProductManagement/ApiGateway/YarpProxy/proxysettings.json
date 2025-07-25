@@ -1,0 +1,32 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "products-route": {
+        "ClusterId": "cluster",
+        "Match": {
+          "Path": "/products/{**catch-all}" 
+        }
+      },
+      "categories-route": {
+        "ClusterId": "cluster", 
+        "Match": {
+          "Path": "/categories/{**catch-all}"
+        }
+      }
+    },
+    "Clusters": {
+      "cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https+http://products-api"
+          }
+        }
+      }
+    },
+    "Services": {
+      "products-api": {
+        "http": "http://localhost:5044"
+      }
+    }
+  }
+}
