@@ -1,74 +1,106 @@
-@ProductsApi_HostAddress = http://localhost:5044
-# Alternativer Host, falls Ihre Anwendung HTTPS auf Port 7294 verwendet:
-# @ProductsApi_HostAddress = https://localhost:7294
+# YarpURL
+@baseUrl = http://localhost:5062 
+# ApiURL
+# @baseUrl = https://localhost:5044
 
-@categoryId_electronics = 00000000-0000-0000-0000-000000000000
-@categoryId_books = 00000000-0000-0000-0000-000000000000
-@categoryId_fashion = 00000000-0000-0000-0000-000000000000
-
-@productId_laptop = 00000000-0000-0000-0000-000000000000
-@productId_mouse = 00000000-0000-0000-0000-000000000000
-@productId_hitchhikersGuide = 00000000-0000-0000-0000-000000000000
-@productId_tShirt = 00000000-0000-0000-0000-000000000000
+# Example Product ID for GET, PUT, DELETE
+@productId = 0198411a-af04-7676-add0-4a8743334d77
+# Example Category ID for GET, PUT, DELETE
+@categoryId = 0198411a-aee8-770b-9a62-c07b54f45b02
 
 ###
-GET {{ProductsApi_HostAddress}}/categories
+### PRODUCTS API ENDPOINTS
+###
+###
+# @name GetAllProducts
+GET {{baseUrl}}/products?PageNumber=1&PageSize=5
+Accept: application/json
 
 ###
-GET {{ProductsApi_HostAddress}}/products
-
-###
-GET {{ProductsApi_HostAddress}}/categories/{{categoryId_electronics}}
-
-###
-PUT {{ProductsApi_HostAddress}}/categories/{{categoryId_fashion}}
+# @name CreateProduct
+POST {{baseUrl}}/products
 Content-Type: application/json
-
 {
-  "id": "{{categoryId_fashion}}",
-  "name": "Apparel"
-}
-
-###
-DELETE {{ProductsApi_HostAddress}}/categories/{{categoryId_books}}
-
-###
-GET {{ProductsApi_HostAddress}}/products/{{productId_laptop}}
-
-###
-PUT {{ProductsApi_HostAddress}}/products/{{productId_mouse}}
-Content-Type: application/json
-
-{
-  "id": "{{productId_mouse}}",
-  "name": "GamingMousePro",
-  "price": 49.99,
-  "description": "High-precision gaming mouse with RGB.",
-  "categoryIds": [
-    "{{categoryId_electronics}}"
-  ]
-}
-
-###
-DELETE {{ProductsApi_HostAddress}}/products/{{productId_tShirt}}
-
-###
-POST {{ProductsApi_HostAddress}}/products
-Content-Type: application/json
-
-{
-  "name": "WirelessHeadphones",
+  "name": "SuperMegaProduct",
   "price": 99.99,
-  "description": "Noise-cancelling headphones for immersive audio.",
+  "description": "A very detailed description of the super mega product.",
   "categoryIds": [
-    "{{categoryId_electronics}}"
+    "{{categoryId}}"
   ]
 }
 
 ###
-POST {{ProductsApi_HostAddress}}/categories
-Content-Type: application/json
+# @name GetAllProducts
+GET {{baseUrl}}/products?SearchTerm=test&PageNumber=1&PageSize=5
+Accept: application/json
 
+###
+# @name GetProductById
+GET {{baseUrl}}/products/{{productId}}
+Accept: application/json
+
+###
+# @name UpdateProduct
+PUT {{baseUrl}}/products
+Content-Type: application/json
 {
-  "name": "NewCategoryForTesting"
+  "id": "{{productId}}",
+  "name": "UpdatedProductName",
+  "price": 123.45,
+  "description": "An updated description.",
+  "categoryIds": [
+    "{{categoryId}}"
+  ]
+}
+
+###
+# @name DeleteProduct
+DELETE {{baseUrl}}/products
+Content-Type: application/json
+{
+  "id": "{{productId}}"
+}
+
+###
+### CATEGORIES API ENDPOINTS
+###
+
+###
+# @name GetAllCategories
+GET {{baseUrl}}/categories
+Accept: application/json
+
+###
+# @name CreateCategory
+POST {{baseUrl}}/categories
+Content-Type: application/json
+{
+  "name": "Electronics"
+}
+
+###
+# @name GetAllCategories
+GET {{baseUrl}}/categories?SearchTerm=test
+Accept: application/json
+
+###
+# @name GetCategoryById
+GET {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+
+###
+# @name UpdateCategory
+PUT {{baseUrl}}/categories
+Content-Type: application/json
+{
+  "id": "{{categoryId}}",
+  "name": "Books & Media"
+}
+
+###
+# @name DeleteCategory
+DELETE {{baseUrl}}/categories
+Content-Type: application/json
+{
+  "id": "{{categoryId}}"
 }
