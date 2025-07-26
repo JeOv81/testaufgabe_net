@@ -115,6 +115,11 @@ Solution\
 
 ### Copyright und Lizenzen
 
--   ** dotnet-project-licenses **
+-   ** dotnet-project-licenses **  
     - dotnet tool install --global dotnet-project-licenses  
     - dotnet-project-licenses --input . --export-license-texts --output-directory Licenses
+
+### Fehlerbehandlung
+
+-   ** Docker **  
+    - docker network prune -f
