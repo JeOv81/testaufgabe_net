@@ -15,6 +15,7 @@ using System.Text;
 using System.Reflection;
 using Infrastructure.Services;
 using Infrastructure.Repositories;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,18 +63,9 @@ builder.AddNpgsqlDbContext<ProductsContext>(connectionName: "products-db");
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Auth
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddAuthorization(options =>
-    {
-        options.FallbackPolicy = new AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .Build();
-    });
-
-    builder.Services.AddAuthorizationBuilder()
-                    .AddPolicy("admin-policy", policy => policy.RequireRole("admin"));
-
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
@@ -83,12 +75,40 @@ if (!builder.Environment.IsDevelopment())
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["Jwt:Issuer"], // Aus appsettings.json
-                ValidAudience = builder.Configuration["Jwt:Audience"], // Aus appsettings.json
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Aus appsettings.json
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
             };
         });
+
+    builder.Services.AddAuthorization(options =>
+    {
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+    });
+
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("admin-policy", policy => policy.RequireRole("admin"));
 }
+else
+{
+    // Auth deaktiviert: Leere Policies akzeptieren alles
+    builder.Services.AddAuthorization(options =>
+    {
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAssertion(_ => true)
+            .Build();
+    });
+
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("admin-policy", policy =>
+        {
+            policy.RequireAssertion(_ => true);
+        });
+}
+
 
 var app = builder.Build();
 
@@ -98,6 +118,21 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.Use(async (context, next) =>
+        {
+            context.User = new ClaimsPrincipal(new ClaimsIdentity(
+                new[]
+                {
+                new Claim(ClaimTypes.Name, "LocalDevUser"),
+                new Claim(ClaimTypes.Role, "admin")
+                }, "DevAuth"));
+
+            await next();
+        });
+    }
 }
 
 app.UseHttpsRedirection();
