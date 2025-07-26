@@ -1,15 +1,14 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure.Persistence;
 
 namespace Application.Features.Categories.Commands;
 public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, Guid>
 {
-    private readonly ProductsContext _context;
+    private readonly ICategoryRepository _repository;
 
-    public CreateCategoryCommandHandler(ProductsContext context)
+    public CreateCategoryCommandHandler(ICategoryRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<Guid> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
@@ -19,9 +18,7 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
             Name = request.Name
         };
 
-        await _context.Categories.AddAsync(category, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _repository.CreateAsync(category, cancellationToken);
         return category.Id;
     }
 }

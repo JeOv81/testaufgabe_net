@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Reflection;
+using Infrastructure.Services;
+using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,17 @@ builder.Services.Scan(scan => scan
         .InNamespaces("Application.Features")
         .Where(type =>
             type.Name.EndsWith("Handler") &&
+            !type.IsAbstract && !type.IsGenericTypeDefinition))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+
+// Scrutor repository registrieren
+builder.Services.Scan(scan => scan
+    .FromAssemblies(typeof(CategoryRepository).Assembly)
+    .AddClasses(classes => classes
+        .InNamespaces("Infrastructure.Repositories")
+        .Where(type =>
+            type.Name.EndsWith("Repository") &&
             !type.IsAbstract && !type.IsGenericTypeDefinition))
     .AsImplementedInterfaces()
     .WithScopedLifetime());

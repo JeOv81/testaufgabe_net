@@ -1,25 +1,21 @@
 ﻿using Application.Interfaces;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Categories.Commands;
 public class DeleteCategoryCommandHandler : ICommandHandler<DeleteCategoryCommand, bool>
 {
-    private readonly ProductsContext _context;
+    private readonly ICategoryRepository _repository;
 
-    public DeleteCategoryCommandHandler(ProductsContext context)
+    public DeleteCategoryCommandHandler(ICategoryRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<bool> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {
 
-        var category = await _context.Categories
-                                     .Include(c => c.Products)
-                                     .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+        var category = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-        if (category == null)
+        if (category is null)
         {
             return false; 
         }
@@ -29,9 +25,7 @@ public class DeleteCategoryCommandHandler : ICommandHandler<DeleteCategoryComman
             throw new InvalidOperationException($"Cannot delete category '{category.Name}' (ID: {category.Id}) because it is still assigned to {category.Products.Count} product(s). Remove product assignments first.");
         }
 
-        _context.Categories.Remove(category);
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _repository.DeleteAsync(category.Id, cancellationToken);
         return true; 
     }
 }

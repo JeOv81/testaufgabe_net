@@ -1,39 +1,50 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure.Persistence;
 
 namespace Application.Features.Products.Commands;
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, Guid>
 {
-    private readonly ProductsContext _context; // Oder ein IProductRepository
+    private readonly IProductRepository _repository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CreateProductCommandHandler(ProductsContext context)
+    public CreateProductCommandHandler(IProductRepository repository, ICategoryRepository categoryRepository)
     {
-        _context = context;
+        _repository = repository;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
+        if (request.CategoryIds == null || request.CategoryIds.Count == 0)
+        {
+            throw new ArgumentException("At least one category must be assigned to the product.", nameof(request.CategoryIds));
+        }
+
+        var areValid = await _categoryRepository.AreValidCategoryIdsAsync(request.CategoryIds, cancellationToken);
+        if (!areValid)
+        {
+            throw new InvalidOperationException("One or more categories do not exist.");
+        }
+
         var product = new Product
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
             Price = request.Price,
-            Description = request.Description
+            Description = request.Description,
+            Categories = new List<Category>()
         };
 
         foreach (var categoryId in request.CategoryIds)
         {
-            var category = await _context.Categories.FindAsync(categoryId);
-            if (category == null)
+            var category = await _categoryRepository.GetByIdAsync(categoryId, cancellationToken);
+            if (category != null)
             {
-                throw new Exception($"Category with ID {categoryId} not found.");
+                product.Categories.Add(category);
             }
-            product.Categories.Add(category);
         }
 
-        await _context.Products.AddAsync(product, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return product.Id; 
+        await _repository.CreateAsync(product, request.CategoryIds, cancellationToken);
+        return product.Id;
     }
 }

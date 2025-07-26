@@ -1,28 +1,25 @@
 ﻿using Application.Interfaces;
-using Infrastructure.Persistence;
 
 namespace Application.Features.Products.Commands;
 public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, bool>
 {
-    private readonly ProductsContext _context;
+    private readonly IProductRepository _repository;
 
-    public DeleteProductCommandHandler(ProductsContext context)
+    public DeleteProductCommandHandler(IProductRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<bool> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _context.Products.FindAsync([request.Id], cancellationToken);
+        var product = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-        if (product == null)
+        if (product is null)
         {
             return false; 
         }
 
-        _context.Products.Remove(product);
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _repository.DeleteAsync(product.Id, cancellationToken);
         return true;
     }
 }
