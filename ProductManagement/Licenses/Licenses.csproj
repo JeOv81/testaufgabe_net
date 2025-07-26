@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Target Name="GenerateLicenses" BeforeTargets="BeforeBuild">
+    <Exec Command="dotnet-project-licenses --input .. --export-license-texts --output-directory Licenses" />
+  </Target>
+
+</Project>
