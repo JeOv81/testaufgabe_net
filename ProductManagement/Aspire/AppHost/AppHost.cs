@@ -16,7 +16,8 @@ builder.AddProject<Projects.MigrationService>("migrationservice")
     .WithOpentelemetry("migrationservice")
     .WithReference(productsDb)
     .WaitFor(productsDb)
-    .WithParentRelationship(sqlserver);
+    .WithParentRelationship(sqlserver)
+    .WaitForCompletion(productsDb);
 
 var angular_ui = builder.AddNpmApp("products-ui-angular", "../../Frontend/ProductsUiAngular")
     .WithOpentelemetry("angular")

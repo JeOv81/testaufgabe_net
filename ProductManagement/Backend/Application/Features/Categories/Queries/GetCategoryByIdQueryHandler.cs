@@ -1,25 +1,21 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Categories.Queries;
 public class GetCategoryByIdQueryHandler : IQueryHandler<GetCategoryByIdQuery, CategoryDto?>
 {
-    private readonly ProductsContext _context;
+    private readonly ICategoryRepository _repository;
 
-    public GetCategoryByIdQueryHandler(ProductsContext context)
+    public GetCategoryByIdQueryHandler(ICategoryRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<CategoryDto?> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
     {
-        var category = await _context.Categories
-                                     .AsNoTracking() 
-                                     .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+        var category = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-        if (category == null)
+        if (category is null)
         {
             return null;
         }

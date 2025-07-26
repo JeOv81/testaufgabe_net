@@ -1,51 +1,41 @@
 ﻿using Application.Interfaces;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Products.Commands;
 public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, bool>
 {
-    private readonly ProductsContext _context;
+    private readonly IProductRepository _repository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public UpdateProductCommandHandler(ProductsContext context)
+    public UpdateProductCommandHandler(IProductRepository repository, ICategoryRepository categoryRepository)
     {
-        _context = context;
+        _repository = repository;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<bool> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _context.Products
-                                    .Include(p => p.Categories)
-                                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
-
-        if (product == null)
+        var product = await _repository.GetByIdWithCategoriesAsync(request.Id, cancellationToken);
+        if (product is null)
         {
-            return false; 
+            return false;
+        }
+
+        if (request.CategoryIds == null || request.CategoryIds.Count == 0)
+        {
+            throw new ArgumentException("At least one category must be assigned to the product.", nameof(request.CategoryIds));
+        }
+
+        var areValid = await _categoryRepository.AreValidCategoryIdsAsync(request.CategoryIds, cancellationToken);
+        if (!areValid)
+        {
+            throw new InvalidOperationException("One or more categories do not exist.");
         }
 
         product.Name = request.Name;
         product.Price = request.Price;
         product.Description = request.Description;
 
-        product.Categories.Clear();
-
-        if (request.CategoryIds == null || !request.CategoryIds.Any())
-        {
-            throw new ArgumentException("At least one category must be assigned to the product.", nameof(request.CategoryIds));
-        }
-
-        foreach (var categoryId in request.CategoryIds)
-        {
-            var category = await _context.Categories.FindAsync(new object[] { categoryId }, cancellationToken);
-            if (category == null)
-            {
-                throw new InvalidOperationException($"Category with ID '{categoryId}' not found.");
-            }
-            product.Categories.Add(category);
-        }
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return true; 
+        await _repository.UpdateAsync(product, request.CategoryIds, cancellationToken);
+        return true;
     }
 }
