@@ -14,7 +14,7 @@ public class CreateProductEndpoint : IEndpoint
            .WithName("CreateProduct")
            .WithTags("Products")
            .AddEndpointFilter<ValidationFilter<CreateProductCommand>>()
-           .Produces<Guid>(StatusCodes.Status201Created) 
+           .Produces<Guid>(StatusCodes.Status201Created)
            .Produces(StatusCodes.Status400BadRequest)
            .Produces(StatusCodes.Status404NotFound);
     }
@@ -26,7 +26,7 @@ public class CreateProductEndpoint : IEndpoint
         try
         {
             var productId = await handler.Handle(command, ct);
-            return Results.Created($"/products/{productId}", new { Id = productId });
+            return Results.Created($"/products/{productId}", productId);
         }
         catch (InvalidOperationException ex)
         {

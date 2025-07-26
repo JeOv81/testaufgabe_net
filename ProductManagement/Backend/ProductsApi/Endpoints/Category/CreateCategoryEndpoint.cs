@@ -24,6 +24,6 @@ public class CreateCategoryEndpoint : IEndpoint
         CancellationToken ct)
     {
         var categoryId = await handler.Handle(command, ct);
-        return Results.Created($"/categories/{categoryId}", new { Id = categoryId });
+        return Results.Created($"/categories/{categoryId}", categoryId);
     }
 }
