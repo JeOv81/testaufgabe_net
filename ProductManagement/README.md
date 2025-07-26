@@ -112,3 +112,9 @@ Solution\
 - Blazor-UI hinzugefügt
 - Angular-UI hinzugefügt
 - Yarp-Proxy hinzugefügt
+
+### Copyright und Lizenzen
+
+-   ** dotnet-project-licenses **
+    - dotnet tool install --global dotnet-project-licenses  
+    - dotnet-project-licenses --input . --export-license-texts --output-directory Licenses
