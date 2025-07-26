@@ -1,29 +1,27 @@
 ﻿using Application.Interfaces;
-using Infrastructure.Persistence;
 
 namespace Application.Features.Categories.Commands;
 public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand, bool>
 {
-    private readonly ProductsContext _context;
+    private readonly ICategoryRepository _repository;
 
-    public UpdateCategoryCommandHandler(ProductsContext context)
+    public UpdateCategoryCommandHandler(ICategoryRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<bool> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category = await _context.Categories.FindAsync(new object[] { request.Id }, cancellationToken);
+        var category = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-        if (category == null)
+        if (category is null)
         {
             return false;
         }
 
         category.Name = request.Name;
 
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _repository.UpdateAsync(category, cancellationToken);
         return true;
     }
 }

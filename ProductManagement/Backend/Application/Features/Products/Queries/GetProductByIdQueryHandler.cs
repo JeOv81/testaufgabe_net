@@ -1,36 +1,28 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Products.Queries;
 public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ProductDto?>
 {
-    private readonly ProductsContext _context;
+    private readonly IProductRepository _repository;
 
-    public GetProductByIdQueryHandler(ProductsContext context)
+    public GetProductByIdQueryHandler(IProductRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<ProductDto?> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await _context.Products
-                                    .Include(p => p.Categories) 
-                                    .AsNoTracking() 
-                                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+        var product = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-        if (product == null)
-        {
-            return null;
-        }
-
-        return new ProductDto(
+        return product is null
+            ? null
+            : new ProductDto(
             product.Id,
             product.Name,
             product.Price,
             product.Description,
-            product.Categories.Select(c => new CategoryDto(c.Id, c.Name)).ToList() 
+            [.. product.Categories.Select(c => new CategoryDto(c.Id, c.Name))]
         );
     }
 }
