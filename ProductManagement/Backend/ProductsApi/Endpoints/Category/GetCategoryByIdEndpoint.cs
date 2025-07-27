@@ -1,6 +1,8 @@
 ﻿using Application.DTOs;
 using Application.Features.Categories.Queries;
 using Application.Interfaces;
+using Application.Resources;
+using Microsoft.Extensions.Localization;
 using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Category;
@@ -20,12 +22,13 @@ public class GetCategoryByIdEndpoint : IEndpoint
     public static async Task<IResult> HandleAsync(
         [AsParameters] GetCategoryByIdQuery query,
         IQueryHandler<GetCategoryByIdQuery, CategoryDto?> handler,
+        IStringLocalizer<MessageTemplate> localizer,
         CancellationToken ct)
     {
         var categoryDto = await handler.Handle(query, ct);
         if (categoryDto == null)
         {
-            return Results.NotFound($"Category with ID '{query.Id}' not found.");
+            return Results.NotFound(localizer["Template_Id_NotFound", "Category", query.Id].Value);
         }
         return Results.Ok(categoryDto);
     }
