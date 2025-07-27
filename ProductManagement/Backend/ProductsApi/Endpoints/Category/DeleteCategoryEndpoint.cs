@@ -1,6 +1,8 @@
 ﻿using Application.Features.Categories.Commands;
 using Application.Interfaces;
+using Application.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Category;
@@ -22,6 +24,7 @@ public class DeleteCategoryEndpoint : IEndpoint
     public static async Task<IResult> HandleAsync(
         [FromBody] DeleteCategoryCommand command,
         ICommandHandler<DeleteCategoryCommand, bool> handler,
+        IStringLocalizer<MessageTemplate> localizer,
         CancellationToken ct)
     {
         try
@@ -29,7 +32,7 @@ public class DeleteCategoryEndpoint : IEndpoint
             var success = await handler.Handle(command, ct);
             if (!success)
             {
-                return Results.NotFound($"Category with ID '{command.Id}' not found.");
+                return Results.NotFound(localizer["Template_Id_NotFound", "Category", command.Id].Value);
             }
             return Results.NoContent();
         }

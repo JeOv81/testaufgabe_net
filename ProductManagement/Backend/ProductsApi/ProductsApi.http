@@ -33,6 +33,7 @@ Content-Type: application/json
 # @name CreateProduct 
 # Invalid CategoryId
 POST {{baseUrl}}/products
+Accept-Language: de-DE
 Content-Type: application/json
 {
   "name": "SuperMegaProduct",
@@ -73,6 +74,15 @@ DELETE {{baseUrl}}/products
 Content-Type: application/json
 {
   "id": "{{productId}}"
+}
+
+###
+# @name DeleteProduct 
+# invalid productId
+DELETE {{baseUrl}}/products
+Content-Type: application/json
+{
+  "id": "12345678-1234-1234-1234-123456789012"
 }
 
 ###

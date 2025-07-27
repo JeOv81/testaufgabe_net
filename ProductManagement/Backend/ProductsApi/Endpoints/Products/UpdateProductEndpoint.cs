@@ -1,6 +1,8 @@
 ﻿using Application.Features.Products.Commands;
 using Application.Interfaces;
+using Application.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using ProductsApi.Filters;
 
 namespace ProductsApi.Endpoints.Products;
@@ -21,6 +23,7 @@ public class UpdateProductEndpoint : IEndpoint
     public static async Task<IResult> HandleAsync(
         [FromBody] UpdateProductCommand command,
         ICommandHandler<UpdateProductCommand, bool> handler,
+        IStringLocalizer<MessageTemplate> localizer,
         CancellationToken ct)
     {
         try
@@ -28,7 +31,7 @@ public class UpdateProductEndpoint : IEndpoint
             var success = await handler.Handle(command, ct);
             if (!success)
             {
-                return Results.NotFound($"Product with ID '{command.Id}' not found.");
+                return Results.NotFound(localizer["Template_Id_NotFound", "Product", command.Id].Value);
             }
             return Results.Ok(); 
         }

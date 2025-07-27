@@ -20,7 +20,7 @@ public class CreateProductEndpoint : IEndpoint
     }
     public static async Task<IResult> HandleAsync(
         [FromBody] CreateProductCommand command,
-        ICommandHandler<CreateProductCommand, Guid> handler, // Handler gibt Guid zurück
+        ICommandHandler<CreateProductCommand, Guid> handler,
         CancellationToken ct)
     {
         try
