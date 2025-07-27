@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
@@ -14,8 +17,21 @@ builder.Services.AddReverseProxy()
     .AddServiceDiscoveryDestinationResolver();
 
 
+string policyName = "fixed";
+builder.Services.AddRateLimiter(_ => _
+    .AddFixedWindowLimiter(policyName: policyName, options =>
+    {
+        options.PermitLimit = 4;
+        options.Window = TimeSpan.FromSeconds(12);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 2;
+    }));
+
 var app = builder.Build();
 
-app.MapReverseProxy();
+app.UseRateLimiter();
+
+app.MapReverseProxy()
+   .RequireRateLimiting(policyName);
 
 app.Run();
