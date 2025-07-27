@@ -30,6 +30,20 @@ Content-Type: application/json
 }
 
 ###
+# @name CreateProduct 
+# Invalid CategoryId
+POST {{baseUrl}}/products
+Content-Type: application/json
+{
+  "name": "SuperMegaProduct",
+  "price": 99.99,
+  "description": "A very detailed description of the super mega product.",
+  "categoryIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ]
+}
+
+###
 # @name GetAllProducts
 GET {{baseUrl}}/products?SearchTerm=test&PageNumber=1&PageSize=5
 Accept: application/json
