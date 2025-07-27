@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace Application.Interfaces;
 public interface ILocalizationService
 {
-    string GetString(string key);
+    string GetString(string key, string resourceBaseName = default!);
 }

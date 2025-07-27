@@ -1,10 +1,12 @@
 ﻿using Application.Features.Products.Commands;
+using Application.Resources;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Validations.Products;
 public class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
-    public UpdateProductCommandValidator()
+    public UpdateProductCommandValidator(IStringLocalizer<Validation> localizer)
     {
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("Product ID is required for update.");

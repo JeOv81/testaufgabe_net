@@ -1,10 +1,12 @@
 ﻿using Application.Features.Products.Queries;
+using Application.Resources;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Validations.Products;
 public class GetAllProductsQueryValidator : AbstractValidator<GetAllProductsQuery>
 {
-    public GetAllProductsQueryValidator()
+    public GetAllProductsQueryValidator(IStringLocalizer<Validation> localizer)
     {
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)

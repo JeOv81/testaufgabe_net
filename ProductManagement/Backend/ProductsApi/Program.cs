@@ -4,16 +4,11 @@ using Application.Validations.Products;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using ProductsApi.Endpoints.Products;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Reflection;
-using Infrastructure.Services;
 using Infrastructure.Repositories;
 using System.Security.Claims;
 
@@ -23,6 +18,18 @@ if (Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider")
 {
     builder.AddServiceDefaults();
 }
+
+//Localizer
+builder.Services.AddLocalization();
+
+// Optional: Kultur automatisch anhand der Accept-Language setzen
+var supportedCultures = new[] { "en", "de" };
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.SetDefaultCulture("en")
+           .AddSupportedCultures(supportedCultures)
+           .AddSupportedUICultures(supportedCultures);
+});
 
 // Scrutor Handler registrieren
 builder.Services.Scan(scan => scan
@@ -111,6 +118,8 @@ else
 
 
 var app = builder.Build();
+
+app.UseRequestLocalization();
 
 app.MapDefaultEndpoints();
 
