@@ -45,10 +45,11 @@ Eine klassische Clean Architecture mit klarer Trennung der Verantwortlichkeiten.
 Domain\ - **Kernlogik, Entitäten, Schnittstellen**  
 ├── Entities\
 └── Interfaces\
-Application\ - **Anwendungslogik, CQRS, DTOs.**  
+Application\ - **Anwendungslogik, CQRS, DTOs, Resources (.resx).**  
 ├── Interfaces\
 ├── Dtos\
 ├── Features\
+├── Resources\
 └── Validations\
 Infrastructure\ - **Implementierungen von Schnittstellen aus der Domain/Application, Datenbankzugriff**  
 ├── Persistence\
@@ -58,7 +59,7 @@ ProductsApi\ - **Einstiegspunkt (API), Endpunkte, Dependency Injection,...**
 ├── Endpoints\
 ├── Filters\
 ├── Interfaces\
-└── Program.cs
+└── Program.cs  
 Tests\ - **NUnit-Testprojekt für Unit- und Integrationstests**
 
 ### Erweitert
@@ -112,6 +113,7 @@ Solution\
 - Blazor-UI hinzugefügt
 - Angular-UI hinzugefügt
 - Yarp-Proxy hinzugefügt
+- Internationalisierung / Lokalisierung (en, de)
 
 ### Copyright und Lizenzen
 
