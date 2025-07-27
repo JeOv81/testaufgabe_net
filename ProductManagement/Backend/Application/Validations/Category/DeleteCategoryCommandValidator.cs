@@ -1,13 +1,16 @@
 ﻿using Application.Features.Categories.Commands;
+using Application.Interfaces;
+using Application.Resources;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Validations.Category;
 public class DeleteCategoryCommandValidator : AbstractValidator<DeleteCategoryCommand>
 {
-    public DeleteCategoryCommandValidator()
+    public DeleteCategoryCommandValidator(IStringLocalizer<Validation> localizer)
     {
         RuleFor(x => x.Id)
             .NotEmpty()
-            .WithMessage("Category ID must not be empty.");
+            .WithMessage(localizer["Category_Id_Required"]);
     }
 }
