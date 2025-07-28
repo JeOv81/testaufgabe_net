@@ -16,8 +16,8 @@
     },
     "Clusters": {
       "cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
-          "LoadBalancingPolicy": "RoundRobin",
           "destination1": {
             "Address": "https+http://products-api"
           }
