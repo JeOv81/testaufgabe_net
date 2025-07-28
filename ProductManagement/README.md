@@ -125,3 +125,23 @@ Solution\
 
 -   ** Docker **  
     - docker network prune -f
+
+### Kiota
+
+-   ** Abhängigkeiten installieren **  
+    - dotnet tool install --global Microsoft.OpenApi.Kiota 
+    - npm install @microsoft/kiota-abstractions @microsoft/kiota-http-fetchlibrary 
+    - npm install `
+  @microsoft/kiota-abstractions@1.0.0-preview.96 `
+  @microsoft/kiota-http-fetchlibrary@1.0.0-preview.96 `
+  @microsoft/kiota-serialization-json@1.0.0-preview.96 `
+  @microsoft/kiota-serialization-form@1.0.0-preview.96 `
+  @microsoft/kiota-serialization-text@1.0.0-preview.96 `
+  @microsoft/kiota-serialization-multipart@1.0.0-preview.96
+    
+### Angular
+
+- ** Services / Components **
+    - ng generate service services/products-api
+    - ng generate component product-list
+    - ng generate component category-list
