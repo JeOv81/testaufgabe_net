@@ -1,0 +1,37 @@
+<h2>Produktliste</h2>
+
+<div *ngIf="loading" class="loading-message">
+    Produkte werden geladen...
+</div>
+
+<div *ngIf="error" class="error-message">
+    {{ error }}
+</div>
+
+<div *ngIf="!loading && !error && products.length === 0" class="no-products-message">
+    Keine Produkte gefunden.
+</div>
+
+<ul *ngIf="!loading && !error && products.length > 0" class="product-list">
+    <li *ngFor="let product of products" class="product-item">
+        <h3>{{ product.name }}</h3>
+
+        <p><strong>Beschreibung:</strong> {{ product.description }}</p>
+
+        <p><strong>Preis:</strong> {{ product.price | currency:'EUR':'symbol':'1.2-2':'de' }}</p>
+
+        <p>
+            <strong>Kategorien:</strong>
+            <span *ngIf="product.categories && product.categories.length > 0">
+                <span *ngFor="let category of product.categories">
+                    {{ category.name }} (ID: {{ category.id }})<br>
+                </span>
+            </span>
+            <span *ngIf="!product.categories || product.categories.length === 0">Keine Kategorie zugewiesen</span>
+        </p>
+
+        <p><strong>ID:</strong> {{ product.id }}</p>
+    </li>
+</ul>
+
+<button (click)="loadProducts()" [disabled]="loading">Produkte neu laden</button>

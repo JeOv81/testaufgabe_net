@@ -7,4 +7,25 @@
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\ProductsUiAngular\browser\</BuildOutputFolder>
   </PropertyGroup>
+
+  <Target Name="GenerateKiotaClientForAngular" AfterTargets="CoreBuild">
+    <PropertyGroup>
+      <OpenApiPath Condition="'$(OpenApiPath)' == ''">$(SolutionDir)Backend\ProductsApi\ProductsApi.json</OpenApiPath>
+      <OutputDirectory Condition="'$(OutputDirectory)' == ''">$(MSBuildProjectDirectory)\src\app\api\products-client</OutputDirectory>
+      <ClientNamespace Condition="'$(ClientNamespace)' == ''">productsapi.client</ClientNamespace>
+      <ClientClassName Condition="'$(ClientClassName)' == ''">ProductsClient</ClientClassName>
+    </PropertyGroup>
+
+    <Message Text="Kiota: Generating Angular API client from $(OpenApiPath)..." Importance="high" />
+
+    <RemoveDir Directories="$(OutputDirectory)" Condition="Exists('$(OutputDirectory)')" />
+
+    <Exec Command="kiota generate -l TypeScript -c $(ClientClassName) -n $(ClientNamespace) -d &quot;$(OpenApiPath)&quot; -o &quot;$(OutputDirectory)&quot;" />
+
+    <Message Text="Kiota: Angular API client generation completed." Importance="high" />
+  </Target>
+  
+  <ItemGroup>
+    <Folder Include="src\app\api\" />
+  </ItemGroup>
 </Project>

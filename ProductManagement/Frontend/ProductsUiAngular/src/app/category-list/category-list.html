@@ -1,0 +1,22 @@
+<h2>Kategorien</h2>
+
+<div *ngIf="loading" class="loading-message">
+    Kategorien werden geladen...
+</div>
+
+<div *ngIf="error" class="error-message">
+    {{ error }}
+</div>
+
+<div *ngIf="!loading && !error && categories.length === 0" class="no-categories-message">
+    Keine Kategorien gefunden.
+</div>
+
+<ul *ngIf="!loading && !error && categories.length > 0" class="category-list">
+    <li *ngFor="let category of categories" class="category-item">
+        <h3>{{ category.name }}</h3>
+        <p><strong>ID:</strong> {{ category.id }}</p>
+    </li>
+</ul>
+
+<button (click)="loadCategories()" [disabled]="loading">Kategorien neu laden</button>
