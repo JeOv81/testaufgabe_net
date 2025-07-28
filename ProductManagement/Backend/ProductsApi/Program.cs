@@ -19,6 +19,28 @@ if (Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider")
     builder.AddServiceDefaults();
 }
 
+//CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularOrigin", 
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+                  .AllowAnyHeader()   
+                  .AllowAnyMethod()    
+                  .AllowCredentials(); // Wichtig wenn Cookies oder Authentifizierungsheader gesendet werden
+        });
+
+    options.AddPolicy("AllowBlazorOrigin",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5010", "https://localhost:7193") 
+                  .AllowAnyHeader()    
+                  .AllowAnyMethod()   
+                  .AllowCredentials(); // Wichtig wenn Cookies oder Authentifizierungsheader gesendet werden
+        });
+});
+
 //Localizer
 builder.Services.AddLocalization();
 
@@ -120,6 +142,8 @@ else
 var app = builder.Build();
 
 app.UseRequestLocalization();
+app.UseCors("AllowAngularOrigin");
+app.UseCors("AllowBlazorOrigin");
 
 app.MapDefaultEndpoints();
 
